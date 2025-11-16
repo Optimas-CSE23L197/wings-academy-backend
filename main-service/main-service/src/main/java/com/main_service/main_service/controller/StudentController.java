@@ -20,6 +20,7 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+<<<<<<< HEAD
     
     @PostMapping("/auth/register")
     public ResponseEntity<ApiResponse> registerStudent(@RequestBody StudentRequest studentRequest) {
@@ -32,4 +33,8 @@ public class StudentController {
     public String susiGala(){
         return "animesh bokachoda";
     } 
+=======
+
+
+>>>>>>> 642a3d95bca73f48109f24ec99db2857217b72e6
 }

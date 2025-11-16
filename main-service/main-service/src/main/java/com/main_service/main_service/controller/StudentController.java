@@ -19,12 +19,6 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
-    
-    @PostMapping("/auth/register")
-    public ResponseEntity<ApiResponse> registerStudent(@RequestBody StudentRequest studentRequest) {
-        studentService.registerStudent(studentRequest);
-        ApiResponse response = new ApiResponse(200, "Student Register Successful");
-        return ResponseEntity.ok(response);
-    }
+
 
 }

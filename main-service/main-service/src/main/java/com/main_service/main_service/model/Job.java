@@ -1,15 +1,26 @@
 package com.main_service.main_service.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "job_table")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,17 +31,15 @@ public class Job {
     private Long jobId;
 
     private String jobTitle;
-
     private String shortDescription;
-
-    @Column(columnDefinition = "TEXT")
     private String fullDescription;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "job_skill_set",
-            joinColumns = @JoinColumn(name = "job_id")
-    )
+    @Column(unique = true)
+    private Long referenceNumber;
+
+
+    @ElementCollection
+    @CollectionTable(name = "job_skill_set", joinColumns = @JoinColumn(name = "job_id"))
     @Column(name = "skill")
     private List<String> skillSet;
 

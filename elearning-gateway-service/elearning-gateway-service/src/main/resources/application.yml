@@ -1,0 +1,82 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: elearning-gateway-service
+
+  codec:
+    max-in-memory-size: 2MB
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${GATEWAY_JWKS_URI:https://auth.example.com/.well-known/jwks.json}
+          issuer-uri: ${GATEWAY_ISSUER:https://auth.example.com/}
+
+  cloud:
+    gateway:
+
+      httpclient:
+        connect-timeout: 3000
+        response-timeout: 5000ms
+
+      default-filters:
+        - RemoveRequestHeader=Cookie
+        - RemoveRequestHeader=Set-Cookie
+        - RemoveRequestHeader=X-Forwarded-For
+        - AddResponseHeader=X-Gateway, SpringCloudGateway
+        - AddRequestHeader=X-Request-Time, {T(java.lang.System).currentTimeMillis()}
+
+      routes:
+
+        # -----------------------------
+        # MAIN SERVICE
+        # -----------------------------
+        - id: main-service
+          uri: ${MAIN_SERVICE_URL:http://main-service:8081}
+          predicates:
+            - Path=/main/**
+            - Path=/public/main/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@userKeyResolver}"
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+
+        # -----------------------------
+        # COURSE SERVICE
+        # -----------------------------
+        - id: course-service
+          uri: ${COURSE_SERVICE_URL:http://course-service:8082}
+          predicates:
+            - Path=/course/**
+          filters:
+            - StripPrefix=1
+
+        # -----------------------------
+        # PAYMENT SERVICE
+        # -----------------------------
+        - id: payment-service
+          uri: ${PAYMENT_SERVICE_URL:http://payment-service:8084}
+          predicates:
+            - Path=/payment/**
+          filters:
+            - StripPrefix=1
+#            - name: paymentFilter
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: INFO

@@ -1,10 +1,10 @@
-package com.elearning_gateway.elearning_gateway;
+package com.elearning_gateway_service.elearning_gateway_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ElearningGatewayApplicationTests {
+class ElearningGatewayServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

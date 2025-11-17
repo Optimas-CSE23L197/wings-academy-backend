@@ -1,4 +1,4 @@
-package com.elearning_gateway_service.elearning_gateway_service.filter;
+package com.elearning.gateway.filter;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -22,12 +22,12 @@ public class JwtUserIdFilter implements WebFilter {
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(ctx -> ctx.getAuthentication())
-                .onErrorResume(e -> Mono.empty())       // if security context fails
-                .switchIfEmpty(Mono.empty())            // guest user → do nothing
+                .onErrorResume(e -> Mono.empty())
+                .switchIfEmpty(Mono.empty())
                 .flatMap(auth -> {
 
-                    if (!(auth instanceof Authentication a) ||
-                            !(a.getPrincipal() instanceof Jwt jwt)) {
+                    // auth is always Authentication — no need to re-check
+                    if (!(auth.getPrincipal() instanceof Jwt jwt)) {
                         return chain.filter(exchange);
                     }
 
@@ -45,9 +45,11 @@ public class JwtUserIdFilter implements WebFilter {
                             .header(USER_HEADER, userId)
                             .build();
 
-                    return chain.filter(exchange.mutate().request(mutatedRequest).build());
+                    return chain.filter(
+                            exchange.mutate().request(mutatedRequest).build()
+                    );
                 })
-                .switchIfEmpty(chain.filter(exchange)); // if everything was empty → continue
+                .switchIfEmpty(chain.filter(exchange));
     }
 
     private String sanitize(String userId) {

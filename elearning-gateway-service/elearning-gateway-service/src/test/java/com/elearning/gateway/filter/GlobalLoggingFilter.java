@@ -1,4 +1,4 @@
-package com.elearning_gateway_service.elearning_gateway_service.filter;
+package com.elearning.gateway.filter;
 
 import org.springframework.core.annotation.Order;
 import org.slf4j.Logger;
@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+
+import com.elearning.gateway.filter.GlobalLoggingFilter;
+
 import reactor.core.publisher.Mono;
 
 /**

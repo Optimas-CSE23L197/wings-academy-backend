@@ -1,4 +1,4 @@
-package com.elearning_gateway_service.elearning_gateway_service.config;
+package com.elearning.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,8 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",     // React dev
                 "http://localhost:4200",     // Angular dev
-                "https://your-frontend.com"  // Production front-end
+                "https://your-frontend.com", // Production front-end
+                "http://127.0.0.1:5501"
         ));
 
         // Allow methods
@@ -34,6 +35,7 @@ public class CorsConfig {
 
         // Allow headers
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization", "Content-Type"));
 
         // Allow authorization (JWT)
         config.setAllowCredentials(true);

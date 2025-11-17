@@ -1,4 +1,4 @@
-package com.elearning_gateway_service.elearning_gateway_service;
+package com.elearning.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -12,7 +12,6 @@ import com.main_service.main_service.service.JobService;
 
 @RestController
 @RequestMapping("/main/api/v1/job")
-@CrossOrigin(origins = "*")
 public class JobController {
 
     @Autowired
@@ -61,6 +60,12 @@ public class JobController {
     public ResponseEntity<ApiResponse> deleteJob(@PathVariable Long jobId) {
         ApiResponse response = jobService.deleteJob(jobId);
         return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    // Get job by referenceNumber (8-digit public reference)
+    @GetMapping("/test")
+    public String test() {
+        return "Hello Test";
     }
 }
 

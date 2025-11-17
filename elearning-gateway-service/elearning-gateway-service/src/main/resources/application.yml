@@ -5,6 +5,11 @@ spring:
   application:
     name: elearning-gateway-service
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   codec:
     max-in-memory-size: 2MB
 
@@ -17,39 +22,35 @@ spring:
 
   cloud:
     gateway:
+      preserve-host-header: true
 
       httpclient:
-        connect-timeout: 3000
-        response-timeout: 5000ms
+        connect-timeout: 10000
+        response-timeout: 10000
 
       default-filters:
         - RemoveRequestHeader=Cookie
         - RemoveRequestHeader=Set-Cookie
         - RemoveRequestHeader=X-Forwarded-For
         - AddResponseHeader=X-Gateway, SpringCloudGateway
-        - AddRequestHeader=X-Request-Time, {T(java.lang.System).currentTimeMillis()}
+        - AddRequestHeader=X-Request-Time, 0
 
       routes:
-
-        # -----------------------------
         # MAIN SERVICE
-        # -----------------------------
         - id: main-service
-          uri: ${MAIN_SERVICE_URL:http://main-service:8081}
+          uri: http://127.0.0.1:8085
           predicates:
             - Path=/main/**
-            - Path=/public/main/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=0
+            - SetRequestHeader=Host, localhost:8085
             - name: RequestRateLimiter
               args:
                 key-resolver: "#{@userKeyResolver}"
-                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.replenishRate: 5
                 redis-rate-limiter.burstCapacity: 20
 
-        # -----------------------------
         # COURSE SERVICE
-        # -----------------------------
         - id: course-service
           uri: ${COURSE_SERVICE_URL:http://course-service:8082}
           predicates:
@@ -57,17 +58,13 @@ spring:
           filters:
             - StripPrefix=1
 
-        # -----------------------------
         # PAYMENT SERVICE
-        # -----------------------------
         - id: payment-service
           uri: ${PAYMENT_SERVICE_URL:http://payment-service:8084}
           predicates:
             - Path=/payment/**
           filters:
             - StripPrefix=1
-#            - name: paymentFilter
-
 
 management:
   endpoints:
@@ -80,3 +77,5 @@ logging:
     root: INFO
     org.springframework.cloud.gateway: INFO
     org.springframework.security: INFO
+    org.springframework.data.redis: DEBUG
+    org.springframework.cloud.gateway.filter.ratelimit: DEBUG

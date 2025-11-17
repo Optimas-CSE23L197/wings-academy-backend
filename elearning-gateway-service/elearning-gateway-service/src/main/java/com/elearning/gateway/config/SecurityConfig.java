@@ -1,43 +1,42 @@
-package com.elearning_gateway_service.elearning_gateway_service.config;
+package com.elearning.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
 @Configuration
-@EnableWebFlux // because gateway use webflux not mvc
 public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
-                // Disable CSRF because Gateway is stateless & reactive
+                // Disable CSRF because Gateway is stateless
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                // api gateway are stateless, so csrf is useless and breaks reactive chains
 
-                // Disable HTTP Basic and Form Login for API gateway
+                // Stateless sessions — do NOT store authentication
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+
+                // Disable logins (gateway uses JWT only)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-//              Gateways never show login forms; clients always send Bearer tokens.
 
-                // Authorize routes
+                // Route-level authorization
                 .authorizeExchange(auth -> auth
                         .pathMatchers(
                                 "/public/**",
                                 "/actuator/**",
-                                "/main/public/**"
+                                "/main/public/**",
+                                "/main/api/v1/**"
                         ).permitAll()
-                        // All other routes need authentication
                         .anyExchange().authenticated()
                 )
 
-//                enable oauth jwt validation
-                .oauth2ResourceServer((oauth -> oauth
-                        .jwt(Customizer.withDefaults()))
-                )
+                // Enable JWT validation
+                .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
+
                 .build();
     }
 }

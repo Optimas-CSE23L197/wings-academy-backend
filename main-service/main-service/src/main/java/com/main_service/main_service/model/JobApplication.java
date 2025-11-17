@@ -28,6 +28,9 @@ public class JobApplication {
     @Column(nullable = false, length = 150)
     private String email;
 
+    @Column(nullable = false, length = 50)
+    private String state;
+
     @Column(nullable = false, length = 100)
     private String country;
 
